@@ -29,7 +29,7 @@ if __name__ == "__main__":
     net_g = SynthesizerTrn(
         hps.data.filter_length // 2 + 1,
         hps.train.segment_size // hps.data.hop_length,
-        **hps.model).cuda()
+        **hps.model).cpu()
     _ = net_g.eval()
     total = sum([param.nelement() for param in net_g.parameters()])
  
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     _ = utils.load_checkpoint(args.ptfile, net_g, None)
 
     print(f"Loading hubert_soft checkpoint")
-    hubert_soft = torch.hub.load("bshall/hubert:main", f"hubert_soft").cuda()
+    hubert_soft = torch.hub.load("bshall/hubert:main", f"hubert_soft").cpu()
     print("Loaded soft hubert.")
     
     print("Processing text...")
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             # tgt
             wav_tgt, _ = librosa.load(tgt, sr=hps.data.sampling_rate)
             wav_tgt, _ = librosa.effects.trim(wav_tgt, top_db=20)
-            wav_tgt = torch.from_numpy(wav_tgt).unsqueeze(0).cuda()
+            wav_tgt = torch.from_numpy(wav_tgt).unsqueeze(0).cpu()
             mel_tgt = mel_spectrogram_torch(
                 wav_tgt, 
                 hps.data.filter_length,
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             )
             # src
             wav_src, _ = librosa.load(src, sr=hps.data.sampling_rate)
-            wav_src = torch.from_numpy(wav_src).unsqueeze(0).unsqueeze(0).cuda()
+            wav_src = torch.from_numpy(wav_src).unsqueeze(0).unsqueeze(0).cpu()
             print(wav_src.size())
             #long running
             #do something other
@@ -81,6 +81,11 @@ if __name__ == "__main__":
             
             c=c.transpose(2,1)
             #print(c.size())
+            # Current mel_tgt: (80, time)
+            mel_tgt = mel_tgt.transpose(0, 1).unsqueeze(0)  # (1, time, 80)
+
+            print("mel_tgt shape before infer:", mel_tgt.shape)
+
             audio = net_g.infer(c, mel=mel_tgt)
          
             audio = audio[0][0].data.cpu().float().numpy()

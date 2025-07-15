@@ -735,7 +735,7 @@ class SynthesizerTrn(nn.Module):
   def infer(self, c, g=None, mel=None, c_lengths=None):
     if c_lengths == None:
       c_lengths = (torch.ones(c.size(0)) * c.size(-1)).to(c.device)
-    g = self.enc_spk.embed_utterance(mel.transpose(1,2))
+    g = self.enc_spk.embed_utterance(mel)
     g = g.unsqueeze(-1)
 
     z_p, m_p, logs_p, c_mask = self.enc_p(c, c_lengths)

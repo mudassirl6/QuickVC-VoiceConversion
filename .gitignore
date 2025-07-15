@@ -1,0 +1,8 @@
+# Python cache files
+__pycache__/
+
+# Model checkpoints and logs
+logs/quickvc/D_1200000.pth
+logs/quickvc/D_1200000/
+logs/quickvc/G_1200000/
+logs/quickvc/quickvc.pth
