@@ -10,3 +10,7 @@ title9|test_data/LJ001-0001.wav|test_data/p229_003.wav
 title10|test_data/p226_005.wav|test_data/p252_003.wav
 title11|test_data/p225_001.wav|test_data/p226_005.wav
 title12|test_data/LJ001-0001.wav|test_data/LJ045-0246.wav
+title13|test_data/harvard.wav|test_data/jackhammer.wav
+title14|test_data/ahmed.wav|test_data/accent.wav
+title15|test_data/venky.wav|test_data/accent.wav
+title16|test_data/ahmed.wav|test_data/venky.wav
