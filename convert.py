@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--hpfile", type=str, default="logs/quickvc/config.json", help="path to json config file")
     parser.add_argument("--ptfile", type=str, default="logs/quickvc/quickvc.pth", help="path to pth file")
-    parser.add_argument("--txtpath", type=str, default="convert.txt", help="path to txt file")
+    parser.add_argument("--txtpath", type=str, default="conv.txt", help="path to txt file")
     parser.add_argument("--outdir", type=str, default="output/quickvc", help="path to output dir")
     parser.add_argument("--use_timestamp", default=False, action="store_true")
     args = parser.parse_args()
@@ -72,8 +72,11 @@ if __name__ == "__main__":
             # src
             wav_src, _ = librosa.load(src, sr=hps.data.sampling_rate)
             wav_src = torch.from_numpy(wav_src).unsqueeze(0).unsqueeze(0).cpu()
+            wav_src = wav_src[:, :, :16000]  # trim to segment size
+            print("wav_src shape:", wav_src.shape)
             print(wav_src.size())
-            #long running
+
+            #long runningss
             #do something other
             c = hubert_soft.units(wav_src)
 

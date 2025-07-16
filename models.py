@@ -3,7 +3,7 @@ import math
 import torch
 from torch import nn
 from torch.nn import functional as F
-
+from fvcore.nn import FlopCountAnalysis, parameter_count
 import commons
 import modules
 import attentions
@@ -700,9 +700,13 @@ class SynthesizerTrn(nn.Module):
     if mb_istft_vits == True:
       print('Mutli-band iSTFT VITS')
       self.dec = Multiband_iSTFT_Generator(inter_channels, resblock, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, gen_istft_n_fft, gen_istft_hop_size, subbands, gin_channels=gin_channels)
+      print("The parameters are ",sum(param.nelement() for param in self.dec.parameters()))
     elif ms_istft_vits == True:
       print('Mutli-stream iSTFT VITS')
       self.dec = Multistream_iSTFT_Generator(inter_channels, resblock, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, gen_istft_n_fft, gen_istft_hop_size, subbands, gin_channels=gin_channels)
+      print("The parameters are ",sum(param.nelement() for param in self.dec.parameters()))
+      from fvcore.nn import FlopCountAnalysis, parameter_count
+
     elif istft_vits == True:
       print('iSTFT-VITS')
       self.dec = iSTFT_Generator(inter_channels, resblock, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, gen_istft_n_fft, gen_istft_hop_size, gin_channels=gin_channels)
@@ -740,6 +744,10 @@ class SynthesizerTrn(nn.Module):
 
     z_p, m_p, logs_p, c_mask = self.enc_p(c, c_lengths)
     z = self.flow(z_p, c_mask, g=g, reverse=True)
+    flops = FlopCountAnalysis(self.dec, (z * c_mask, g))
+    gflops = flops / 1e9
+    print(f"GFLOPs: {gflops:.2f}")
+    exit()
     o,o_mb = self.dec(z * c_mask, g=g)
     
     return o
